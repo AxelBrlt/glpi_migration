@@ -1,0 +1,33 @@
+services:
+  # Configuration du conteneur MariaDB
+  mariadb:
+    image: mariadb:11.5.2
+    container_name: mariadb
+    depends_on:
+      - glpi
+    hostname: mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+    env_file:
+      - ./mariadb.env
+    restart: always
+
+  # Configuration du conteneur GLPI
+  glpi:
+    image: smag-glpi
+    container_name: glpi
+    hostname: glpi
+    environment:
+      - DB_HOST=mariadb
+      - TIMEZONE=Europe/Paris
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./glpi_data:/var/www/html/glpi
+    restart: always
+
+volumes:
+  db_data:
